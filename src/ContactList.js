@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import ContactRow from "./ContactRow";
+import PropTypes from "prop-types";
 
-const Contacts = (props) => {
-  //   console.log(props.contacts);
+const ContactList = (props) => {
+  const { contacts, selectContact } = props;
   return (
     <table>
       <tbody>
@@ -11,25 +12,23 @@ const Contacts = (props) => {
           <th>Phone</th>
           <th>Email</th>
         </tr>
-        {props.contacts.map((contact) => {
-          return <ContactRow key={contact.id} contacts={contact} />;
+        {contacts.map((contact) => {
+          return (
+            <ContactRow
+              key={contact.id}
+              contact={contact}
+              selectContact={selectContact}
+            />
+          );
         })}
       </tbody>
     </table>
   );
 };
 
-export default Contacts;
+export default ContactList;
 
-{
-  /* <tr>
-{
-  props.contacts.map((contacts) => {
-          return <ContactRow key={props.contacts.id} />;
-          <td>{singleContact.name}</td>
-          <td>{singleContact.phone}</td>
-          <td>{singleContact.email}</td>
-          </tr>
-        })
-      }  */
-}
+ContactList.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.object),
+  selectContact: PropTypes.func,
+};

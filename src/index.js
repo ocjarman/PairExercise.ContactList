@@ -1,16 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM, { render } from "react-dom";
-import Contacts from "./ContactList";
-import ContactRow from "./ContactRow";
+import ContactList from "./ContactList";
+import SingleContact from "./SingleContact";
+import Favorite from "./Favorite";
 
-const dummyContacts = [
-  { id: 1, name: "R2-D2", phone: "222-222-2222", email: "r2d2@droids.com" },
-  { id: 2, name: "C-3PO", phone: "333-333-3333", email: "c3po@droids.com" },
-  { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
-];
+const Main = () => {
+  const [contacts, setContacts] = useState([]); // -> [thing, setThing]
+  const [selectedContact, setSelectedContact] = useState({}); // -> [thing, setThing]
 
-const Main = ({ key }) => {
-  const [contacts, setContacts] = useState(dummyContacts); // -> [thing, setThing]
+  const getContacts = async () => {
+    const response = await fetch(
+      "http://jsonplace-univclone.herokuapp.com/users"
+    );
+    const contacts = await response.json();
+    // console.log(contacts);
+    setContacts(contacts);
+  };
+
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const selectContact = async (contactId, favoriteData) => {
+    const response = await fetch(
+      `http://jsonplace-univclone.herokuapp.com/users/${contactId}`
+    );
+    const contact = await response.json();
+    console.log("index.js selectcontact fxn", contact);
+    console.log("fav data:", favoriteData);
+
+    //merging contact object with favorite key/value
+    const contactWithFavData = {
+      ...contact,
+      ...favoriteData,
+    };
+
+    console.log("contactWithFavData: ", contactWithFavData);
+    //what is this line doing?
+    setSelectedContact(contactWithFavData); // `favoriteData` object contains `{favorite: true} or false
+  };
 
   return (
     <div id="main">
@@ -18,7 +46,14 @@ const Main = ({ key }) => {
         <div>Contact List</div>
       </div>
       <div id="container">
-        <Contacts contacts={contacts} />
+        {selectedContact.id ? (
+          <SingleContact
+            selectedContact={selectedContact}
+            selectContact={selectContact}
+          />
+        ) : (
+          <ContactList contacts={contacts} selectContact={selectContact} />
+        )}
       </div>
     </div>
   );
